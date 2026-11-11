@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة التقنية والأناقة — بوابتك إلى الاحتراف الرقمي</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0F172A',
+                        cardBg: 'rgba(30, 41, 59, 0.7)',
+                        accentCyan: '#06B6D4',
+                        accentBlue: '#3B82F6',
+                        accentViolet: '#8B5CF6',
+                        glassBorder: 'rgba(255, 255, 255, 0.1)',
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism styling */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06B6D4;
+        }
+
+        /* Glowing accents */
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+        }
+
+        /* Code Editor Textarea Styling */
+        .code-input {
+            font-family: 'Courier New', Courier, monospace;
+            tab-size: 2;
+        }
+
+        /* Toast notification animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%) translateX(50%); opacity: 0; }
+            to { transform: translateY(0) translateX(50%); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-microchip text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400 font-tajawal">
+                            منصة التقنية والأناقة
+                        </h1>
+                        <p class="text-xs text-cyan-400 font-medium">بوابتك إلى الاحتراف الرقمي</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+                    <button onclick="switchTab('text-prompt')" id="tab-btn-text-prompt" class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-cyan-400 bg-slate-800/90 shadow-sm">
+                        <i class="fa-solid fa-terminal text-xs"></i>
+                        <span>أوامر النصوص</span>
+                    </button>
+                    <button onclick="switchTab('image-prompt')" id="tab-btn-image-prompt" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                        <span>أوامر الصور</span>
+                    </button>
+                    <button onclick="switchTab('code-editor')" id="tab-btn-code-editor" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i class="fa-solid fa-code text-xs"></i>
+                        <span>محرر الأكواد</span>
+                    </button>
+                    <button onclick="switchTab('tech-specs')" id="tab-btn-tech-specs" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800/50">
+                        <i class="fa-solid fa-layer-group text-xs"></i>
+                        <span>المواصفات والتوثيق</span>
+                    </button>
+                </nav>
+
+                <!-- Status Badge -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        النظام متصل (v2.4)
+                    </span>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-toggle" onclick="toggleMobileMenu()" class="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('text-prompt')" class="w-full text-right px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-cyan-400"></i> منشئ الأوامر الذكية
+            </button>
+            <button onclick="switchTab('image-prompt')" class="w-full text-right px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-wand-magic-sparkles text-violet-400"></i> منشئ أوامر الصور
+            </button>
+            <button onclick="switchTab('code-editor')" class="w-full text-right px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-code text-blue-400"></i> محرر الأكواد والتمارين
+            </button>
+            <button onclick="switchTab('tech-specs')" class="w-full text-right px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-layer-group text-emerald-400"></i> المواصفات والتسليمات
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- SECTION 1: AI PROMPT GENERATOR (FREE TOOL) -->
+        <section id="section-text-prompt" class="tab-content block space-y-8">
+            <!-- Header Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border-t border-cyan-500/30">
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-4">
+                        <i class="fa-solid fa-bolt text-xs"></i> أداة مجانية احترافية
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">منشئ الأوامر الذكية (AI Prompt Generator)</h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        صمّم أوامرك بدقة هندسية عالية للحصول على أفضل المخرجات من نماذج الذكاء الاصطناعي (ChatGPT, Claude, Gemini). اختر نموذجاً جاهزاً أو قم بصياغة سياقك الخاص.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Main Interface Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left/Main Form Column (7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-card rounded-2xl p-6 space-y-5">
+                        
+                        <!-- Quick Templates Header -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                                <i class="fa-solid fa-cubes text-cyan-400 ml-1"></i> القوالب السريعة الشائعة
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                <button onclick="loadTextTemplate('article')" class="px-3 py-2.5 bg-slate-800/80 hover:bg-cyan-900/40 hover:border-cyan-500/40 border border-slate-700/60 rounded-xl text-xs font-semibold text-slate-200 transition text-center flex flex-col items-center gap-1.5">
+                                    <i class="fa-solid fa-newspaper text-cyan-400 text-base"></i>
+                                    <span>كتابة مقال</span>
+                                </button>
+                                <button onclick="loadTextTemplate('code')" class="px-3 py-2.5 bg-slate-800/80 hover:bg-cyan-900/40 hover:border-cyan-500/40 border border-slate-700/60 rounded-xl text-xs font-semibold text-slate-200 transition text-center flex flex-col items-center gap-1.5">
+                                    <i class="fa-solid fa-code-compare text-blue-400 text-base"></i>
+                                    <span>مراجعة كود</span>
+                                </button>
+                                <button onclick="loadTextTemplate('data')" class="px-3 py-2.5 bg-slate-800/80 hover:bg-cyan-900/40 hover:border-cyan-500/40 border border-slate-700/60 rounded-xl text-xs font-semibold text-slate-200 transition text-center flex flex-col items-center gap-1.5">
+                                    <i class="fa-solid fa-chart-pie text-emerald-400 text-base"></i>
+                                    <span>تحليل بيانات</span>
+                                </button>
+                                <button onclick="loadTextTemplate('marketing')" class="px-3 py-2.5 bg-slate-800/80 hover:bg-cyan-900/40 hover:border-cyan-500/40 border border-slate-700/60 rounded-xl text-xs font-semibold text-slate-200 transition text-center flex flex-col items-center gap-1.5">
+                                    <i class="fa-solid fa-bullhorn text-violet-400 text-base"></i>
+                                    <span>تسويق محتوى</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Form Inputs -->
+                        <div class="space-y-4 pt-2">
+                            <!-- Role & Objective -->
+                            <div>
+                                <label for="text-role" class="block text-xs font-semibold text-slate-300 mb-1.5">1. الدور والهدف الرئيسي (Role & Objective)</label>
+                                <input type="text" id="text-role" oninput="updateTextPrompt()" placeholder="مثال: بصفتك خبيراً في الأمن السيبراني، اشرح مفهوم الهندسة الاجتماعية..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+                            </div>
+
+                            <!-- Context -->
+                            <div>
+                                <label for="text-context" class="block text-xs font-semibold text-slate-300 mb-1.5">2. السياق والخلفية (Context & Background)</label>
+                                <textarea id="text-context" oninput="updateTextPrompt()" rows="2" placeholder="أضف معلومات خلفية: الجمهور المستهدف هم مبتدئون في مجال التقنية..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition resize-none"></textarea>
+                            </div>
+
+                            <!-- Constraints & Safety -->
+                            <div>
+                                <label for="text-constraints" class="block text-xs font-semibold text-slate-300 mb-1.5">3. القيود والشروط (Constraints & Boundaries)</label>
+                                <input type="text" id="text-constraints" oninput="updateTextPrompt()" placeholder="مثال: لا تتجاوز 300 كلمة، تجنب المصطلحات المعقدة، استخدم أسلوباً مبسطاً..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+                            </div>
+
+                            <!-- Desired Output Format -->
+                            <div>
+                                <label for="text-format" class="block text-xs font-semibold text-slate-300 mb-1.5">4. صيغة المخرجات المطلوبة (Output Format)</label>
+                                <select id="text-format" onchange="updateTextPrompt()" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition">
+                                    <option value="نقاط محددة وقائمة منسقة">نقاط محددة وقائمة منسقة (Bullet Points)</option>
+                                    <option value="جدول تقني منظم">جدول مقارنة منظم (Structured Table)</option>
+                                    <option value="مقالة متكاملة مع عناوين فرعية">مقالة متكاملة (Full Article)</option>
+                                    <option value="شيفرة برمجية مع التعليقات الشارحة">كود برمجي مشروح (Annotated Code Block)</option>
+                                    <option value="خطوات إجرائية 1، 2، 3">خطوات إجرائية (Step-by-Step Guide)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Preview & Validation Column (5 Cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- Live Prompt Preview Panel -->
+                    <div class="glass-card rounded-2xl p-6 flex flex-col h-full justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-eye text-cyan-400"></i> المعاينة المباشرة للأمر النهائي
+                                </h3>
+                                <span id="prompt-char-count" class="text-xs text-slate-400 font-mono">0 حرف</span>
+                            </div>
+                            
+                            <!-- Prompt Display Box -->
+                            <div id="text-prompt-output" class="w-full min-h-[220px] bg-slate-950/90 border border-slate-800 rounded-xl p-4 text-xs sm:text-sm text-slate-200 font-mono leading-relaxed whitespace-pre-wrap select-all">
+أدخل التفاصيل في النموذج على اليمين لتوليد الأمر المحسّن هنا...
+                            </div>
+                        </div>
+
+                        <!-- Quality Indicator & Guardrail Warning -->
+                        <div class="space-y-3 pt-2 border-t border-slate-800">
+                            <div>
+                                <div class="flex justify-between items-center text-xs mb-1.5">
+                                    <span class="text-slate-400 font-semibold">مؤشر جودة الأمر:</span>
+                                    <span id="quality-score-text" class="font-bold text-slate-500">منخفض (0%)</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                    <div id="quality-score-bar" class="bg-slate-600 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+
+                            <!-- Guardrail Safety Status -->
+                            <div id="guardrail-badge" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400">
+                                <i class="fa-solid fa-shield-halved text-cyan-400 text-sm"></i>
+                                <span id="guardrail-text">فحص المحتوى: لا توجد تحذيرات أمان حتى الآن.</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-3 gap-2 pt-1">
+                            <button onclick="copyTextPrompt()" class="px-3 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-lg shadow-cyan-600/20">
+                                <i class="fa-regular fa-copy"></i> نسخ
+                            </button>
+                            <button onclick="shareTextPrompt()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-slate-700">
+                                <i class="fa-solid fa-share-nodes"></i> مشاركة
+                            </button>
+                            <button onclick="exportTextPrompt()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition border border-slate-700">
+                                <i class="fa-solid fa-download"></i> تصدير TXT
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 2: AI IMAGE PROMPT GENERATOR -->
+        <section id="section-image-prompt" class="tab-content hidden space-y-8">
+            <!-- Header Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border-t border-violet-500/30">
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 mb-4">
+                        <i class="fa-solid fa-palette text-xs"></i> توليد الفن البصري
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">منشئ أوامر الصور الذكية (AI Image Prompt Generator)</h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        قم بصياغة أوامر بصرية فائقة الدقة لنماذج مثل Midjourney, DALL-E 3, و Flux.1 مع التحكم في النمط، الإضاءة، الكاميرا، والسلبيات (Negative Prompts).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Presets Carousel -->
+            <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+                <span class="text-xs font-bold text-slate-400 shrink-0">نماذج مجهزة:</span>
+                <button onclick="applyImagePreset('smartwatch')" class="px-3.5 py-2 bg-slate-800/90 hover:bg-violet-900/40 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-clock text-violet-400"></i> ساعة ذكية فاخرة
+                </button>
+                <button onclick="applyImagePreset('dashboard')" class="px-3.5 py-2 bg-slate-800/90 hover:bg-violet-900/40 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-display text-cyan-400"></i> لوحة تحكم مستقبلية
+                </button>
+                <button onclick="applyImagePreset('portrait')" class="px-3.5 py-2 bg-slate-800/90 hover:bg-violet-900/40 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-user-astronaut text-blue-400"></i> بورتريه تقني سينمائي
+                </button>
+                <button onclick="applyImagePreset('architecture')" class="px-3.5 py-2 bg-slate-800/90 hover:bg-violet-900/40 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-building-user text-emerald-400"></i> عمائر بيئية فائقة التطور
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Configuration Controls (7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-card rounded-2xl p-6 space-y-5">
+                        
+                        <!-- Core Subject Input -->
+                        <div>
+                            <label for="img-subject" class="block text-xs font-semibold text-slate-300 mb-1.5">الموضوع الرئيسي (Subject Description)</label>
+                            <input type="text" id="img-subject" oninput="updateImagePrompt()" placeholder="مثال: A futuristic luxury smartwatch with glowing holographic UI..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-500 transition font-mono">
+                        </div>
+
+                        <!-- Grid Options: Model & Style -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="img-model" class="block text-xs font-semibold text-slate-300 mb-1.5">نموذج الذكاء الاصطناعي (Model)</label>
+                                <select id="img-model" onchange="updateImagePrompt()" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition">
+                                    <option value="midjourney">Midjourney v6</option>
+                                    <option value="dalle3">DALL-E 3</option>
+                                    <option value="flux">Flux.1 Schnell / Dev</option>
+                                    <option value="sdxl">Stable Diffusion XL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="img-style" class="block text-xs font-semibold text-slate-300 mb-1.5">النمط الفني (Style Preset)</label>
+                                <select id="img-style" onchange="updateImagePrompt()" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition">
+                                    <option value="Cyberpunk Luxury, Neon accents, Sleek dark metal">Cyberpunk Luxury (سقيفة سايبربنك فاخرة)</option>
+                                    <option value="Hyper-photorealistic, 8k resolution, Unreal Engine 5 render">Photorealistic (واقعي فائق الدقة)</option>
+                                    <option value="Minimalist Tech, Clean lines, Studio background">Minimalist Tech (تقني مبسط)</option>
+                                    <option value="Cinematic Studio Portrait, Dramatic lighting, 85mm lens">Studio Portrait (بورتريه استوديو سينمائي)</option>
+                                    <option value="3D Isometric Render, Octane render, Vibrant colors">3D Isometric Render (ثلاثي الأبعاد)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Grid Options: Aspect Ratio & Lighting -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="img-aspect" class="block text-xs font-semibold text-slate-300 mb-1.5">أبعاد الصورة (Aspect Ratio)</label>
+                                <select id="img-aspect" onchange="updateImagePrompt()" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition">
+                                    <option value="16:9">16:9 (عريض - شاشات وعروض)</option>
+                                    <option value="1:1">1:1 (مربع - شبكات التواصل)</option>
+                                    <option value="9:16">9:16 (طولي - ريلز وستوري)</option>
+                                    <option value="4:3">4:3 (شاشة قياسية)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="img-lighting" class="block text-xs font-semibold text-slate-300 mb-1.5">نمط الإضاءة (Lighting Setup)</label>
+                                <select id="img-lighting" onchange="updateImagePrompt()" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-violet-500 transition">
+                                    <option value="Volumetric soft studio lighting, Raytracing glow">إضاءة استوديو ناعمة وتتبع الأشعة</option>
+                                    <option value="Golden hour natural sunlight, warm glow">إضاءة الساعة الذهبية الطبيعية</option>
+                                    <option value="Dark moody ambient light with cyan neon highlights">إضاءة داكنة مع توهج نيوني</option>
+                                    <option value="Biomimetic soft ambient illumination">إضاءة المحيط البيئي الناعمة</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Camera & Lens Details -->
+                        <div>
+                            <label for="img-camera" class="block text-xs font-semibold text-slate-300 mb-1.5">مواصفات الكاميرا والعدسة (Camera & Lens)</label>
+                            <input type="text" id="img-camera" oninput="updateImagePrompt()" value="Shot on Hasselblad H6D-100c, 85mm f/1.4 lens, shallow depth of field" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-500 transition font-mono">
+                        </div>
+
+                        <!-- Negative Prompt & Seed -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="sm:col-span-2">
+                                <label for="img-negative" class="block text-xs font-semibold text-slate-300 mb-1.5">المستبعدات (Negative Prompt)</label>
+                                <input type="text" id="img-negative" oninput="updateImagePrompt()" value="blurry, distorted details, low quality, oversaturated, text, watermark" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-violet-500 transition font-mono">
+                            </div>
+                            <div>
+                                <label for="img-seed" class="block text-xs font-semibold text-slate-300 mb-1.5">رقم البذرة (Seed)</label>
+                                <input type="number" id="img-seed" oninput="updateImagePrompt()" placeholder="عشوائي" class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-violet-500 transition font-mono">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Column Output & Visual Simulator (5 Cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-card rounded-2xl p-6 flex flex-col justify-between space-y-4">
+                        
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-code text-violet-400"></i> صيغة الأمر النهائية (English Prompt)
+                                </h3>
+                                <span class="text-xs text-violet-400 font-semibold uppercase" id="selected-model-badge">Midjourney v6</span>
+                            </div>
+
+                            <!-- Final Compiled Image Prompt -->
+                            <div id="image-prompt-output" class="w-full min-h-[140px] bg-slate-950/90 border border-slate-800 rounded-xl p-4 text-xs font-mono text-violet-200 leading-relaxed whitespace-pre-wrap select-all">
+--
+                            </div>
+                        </div>
+
+                        <!-- Simulated Canvas Visual Preview -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-400">معاينة محاكاة المظهر البصري المتوقع:</label>
+                            <div id="simulated-canvas-box" class="w-full h-44 rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-violet-950/60 p-4 flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+                                <div class="absolute inset-0 bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
+                                <div class="relative z-10 flex justify-between items-start">
+                                    <span class="px-2 py-1 bg-black/60 backdrop-blur rounded text-[10px] font-mono text-cyan-400 border border-cyan-500/30" id="preview-ratio-label">16:9</span>
+                                    <span class="px-2 py-1 bg-black/60 backdrop-blur rounded text-[10px] font-mono text-emerald-400 border border-emerald-500/30">Ready for generation</span>
+                                </div>
+                                <div class="relative z-10 text-center space-y-1">
+                                    <i class="fa-solid fa-image text-3xl text-violet-400/80"></i>
+                                    <p class="text-xs text-slate-300 font-medium" id="preview-style-label">Cyberpunk Luxury Style</p>
+                                </div>
+                                <div class="relative z-10 flex justify-between items-end text-[10px] text-slate-400 font-mono">
+                                    <span>Model: <strong id="preview-model-label" class="text-white">Midjourney</strong></span>
+                                    <span>Seed: <strong id="preview-seed-label" class="text-white">Random</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button onclick="copyImagePrompt()" class="px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-violet-600/20">
+                                <i class="fa-regular fa-copy"></i> نسخ الأمر النهائي
+                            </button>
+                            <button onclick="exportImagePrompt()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition border border-slate-700">
+                                <i class="fa-solid fa-file-export"></i> تصدير التوصيف
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: INTERACTIVE CODE EDITOR & PRACTICE DASHBOARD -->
+        <section id="section-code-editor" class="tab-content hidden space-y-8">
+            <!-- Header Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border-t border-blue-500/30">
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
+                        <i class="fa-solid fa-laptop-code text-xs"></i> بيئة تطوير متكاملة
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">محرر الأكواد التفاعلي والتمارين (Live Sandbox & Exercises)</h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        اكتب وطبّق كود HTML/CSS/JS مباشرة بدون الحاجة لتثبيت أي برامج. اختبر مهاراتك من خلال التمارين التفاعلية ونظام التحقق الآلي من النتائج.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Exercises Bar -->
+            <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 border-slate-700/60">
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white" id="exercise-title">التمرين الأول: إنشاء بطاقة تعريفية أنيقة</h3>
+                        <p class="text-xs text-slate-400" id="exercise-desc">عدّل العنوان وأضف زراً تفاعلياً بأسلوب Tailwind CSS.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                    <button onclick="toggleHintModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-regular fa-lightbulb"></i> تلميح الحل
+                    </button>
+                    <button onclick="validateSolution()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-lg shadow-emerald-600/20">
+                        <i class="fa-solid fa-circle-check"></i> التحقق من الإجابة
+                    </button>
+                    <select id="exercise-selector" onchange="loadExercise(this.value)" class="bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500">
+                        <option value="1">تمرين 1: بطاقة تعريفية</option>
+                        <option value="2">تمرين 2: زر تفاعلي (JavaScript)</option>
+                        <option value="3">تمرين 3: شبكة أسعار متجاوبة</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Code Editor & Sandbox Split Workspace -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[580px]">
+                
+                <!-- Code Editor Column (6 Cols) -->
+                <div class="lg:col-span-6 flex flex-col glass-card rounded-2xl overflow-hidden border border-slate-800">
+                    
+                    <!-- Code Tab Bar -->
+                    <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchCodeTab('html')" id="code-tab-html" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition">HTML</button>
+                            <button onclick="switchCodeTab('css')" id="code-tab-css" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">CSS</button>
+                            <button onclick="switchCodeTab('js')" id="code-tab-js" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">JavaScript</button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="loadDefaultTemplate()" title="استيراد نموذج جاهز" class="p-1.5 text-slate-400 hover:text-cyan-400 rounded-lg transition">
+                                <i class="fa-solid fa-file-import text-sm"></i>
+                            </button>
+                            <button onclick="saveProgress()" title="حفظ التقدم المحلي" class="p-1.5 text-slate-400 hover:text-emerald-400 rounded-lg transition">
+                                <i class="fa-solid fa-floppy-disk text-sm"></i>
+                            </button>
+                            <button onclick="resetEditorCode()" title="إعادة ضبط" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg transition">
+                                <i class="fa-solid fa-rotate-right text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Code Editors -->
+                    <div class="flex-grow relative bg-slate-950">
+                        <textarea id="editor-html" class="code-input w-full h-full min-h-[420px] bg-slate-950 text-slate-100 p-4 text-xs sm:text-sm leading-relaxed focus:outline-none resize-none font-mono" spellcheck="false"></textarea>
+                        <textarea id="editor-css" class="code-input w-full h-full min-h-[420px] bg-slate-950 text-slate-100 p-4 text-xs sm:text-sm leading-relaxed focus:outline-none resize-none font-mono hidden" spellcheck="false"></textarea>
+                        <textarea id="editor-js" class="code-input w-full h-full min-h-[420px] bg-slate-950 text-slate-100 p-4 text-xs sm:text-sm leading-relaxed focus:outline-none resize-none font-mono hidden" spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- Editor Footer Control -->
+                    <div class="bg-slate-900/90 px-4 py-3 border-t border-slate-800 flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-mono" id="editor-status">جاهز للتحرير...</span>
+                        <button onclick="runCodePreview()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-blue-600/20">
+                            <i class="fa-solid fa-play"></i> تشغيل الكود
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Iframe Sandbox Preview Column (6 Cols) -->
+                <div class="lg:col-span-6 flex flex-col glass-card rounded-2xl overflow-hidden border border-slate-800">
+                    <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                            <span class="text-xs font-semibold text-slate-400 mr-2">المعاينة المباشرة (Sandboxed Iframe)</span>
+                        </div>
+                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/20">Isolation Active</span>
+                    </div>
+
+                    <!-- Sandbox Iframe Output Container -->
+                    <div class="flex-grow bg-slate-900 min-h-[420px] relative">
+                        <iframe id="sandbox-iframe" class="w-full h-full min-h-[450px] border-none bg-white rounded-b-2xl" sandbox="allow-scripts"></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 4: TECHNICAL ARCHITECTURE & DELIVERABLES -->
+        <section id="section-tech-specs" class="tab-content hidden space-y-8">
+            <!-- Header Banner -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border-t border-emerald-500/30">
+                <div class="absolute -left-10 -top-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-4">
+                        <i class="fa-solid fa-shield-halved text-xs"></i> البنية التحتية والوثائق
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">المواصفات التقنية ووثائق التسليم (Technical Architecture)</h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        نظرة شاملة على معايير الأمان المتبعة، هيكلية المنصة، المخرجات النهائية للمشروع، والجدول الزمني الإجرائي لمراحل التطوير والتسليم.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Architecture Grid Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Front-End Stack Card -->
+                <div class="glass-card rounded-2xl p-6 space-y-4 hover:border-cyan-500/40 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">1. الواجهة الأمامية (Front-End)</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        بنية خفيفة الوزن تعتمد على Vanilla JavaScript (ES6+) مع إطار Tailwind CSS للتنسيق العصري المرن، مما يضمن أداءً فائقاً بسرعة تحميل استثنائية.
+                    </p>
+                    <ul class="text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-cyan-400 text-[10px]"></i> دعم تام لاتتجاه RTL واللغة العربية</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-cyan-400 text-[10px]"></i> خطوط جبال Cairo و Tajawal المتناسقة</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-cyan-400 text-[10px]"></i> تجاوب كامل مع جميع الشاشات</li>
+                    </ul>
+                </div>
+
+                <!-- Security & Protection Card -->
+                <div class="glass-card rounded-2xl p-6 space-y-4 hover:border-emerald-500/40 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">2. معايير الأمان (Security & CSP)</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        تطبيق أعلى مستويات الحماية والوقاية من الهجمات عبر معالجة المدخلات وعزل البيئات التفاعلية بشكل كامل.
+                    </p>
+                    <ul class="text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-shield text-emerald-400 text-[10px]"></i> الحماية من هجمات XSS وتنقية النصوص</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-shield text-emerald-400 text-[10px]"></i> استخدام Sandboxed Iframes للمحرر</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-shield text-emerald-400 text-[10px]"></i> فلترة أوامر الذكاء الاصطناعي الضارة</li>
+                    </ul>
+                </div>
+
+                <!-- Deliverables Card -->
+                <div class="glass-card rounded-2xl p-6 space-y-4 hover:border-violet-500/40 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">3. وثائق ومخرجات التسليم</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        حزمة تسليم شاملة تضمن سهولة الصيانة، التطوير المستقبلي، واختبار جودة الأداء المباشر.
+                    </p>
+                    <ul class="text-xs text-slate-400 space-y-2 border-t border-slate-800 pt-3">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-file-code text-violet-400 text-[10px]"></i> الشيفرة المصدرية الموثقة بالكامل</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-file-code text-violet-400 text-[10px]"></i> ملفات تصميم Figma ودليل الهوية</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-file-code text-violet-400 text-[10px]"></i> تقارير اختبار حالات الاستخدام (Test Cases)</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Phased Timeline & KPI Roadmap -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">الخطة الزمنية ومؤشرات النجاح (Project Roadmap & KPIs)</h3>
+                        <p class="text-xs text-slate-400 mt-1">المراحل التنفيذية الأربع لإطلاق المنصة ومعايير قياس الأداء</p>
+                    </div>
+                    <span class="px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-xl text-xs font-bold border border-blue-500/20 w-max">
+                        إجمالي مدة المشروع: 4 أسابيع
+                    </span>
+                </div>
+
+                <!-- Timeline Steps -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs text-cyan-400 font-mono">
+                            <span>المرحلة 1</span>
+                            <span>الأسبوع 1</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">التخطيط وتصميم UI/UX</h4>
+                        <p class="text-xs text-slate-400">إعداد واجهات Figma وتحديد الهوية البصرية ونماذج التفاعل.</p>
+                        <div class="pt-2 text-[11px] text-slate-300 font-semibold border-t border-slate-800/60">
+                            KPI: اعتماد 100% للشاشات الرئيسية
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs text-blue-400 font-mono">
+                            <span>المرحلة 2</span>
+                            <span>الأسبوع 2</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">تطوير أدوات AI</h4>
+                        <p class="text-xs text-slate-400">بناء مولد الأوامر النصية والبصرية وتكامل المعالجة المحلية.</p>
+                        <div class="pt-2 text-[11px] text-slate-300 font-semibold border-t border-slate-800/60">
+                            KPI: وقت استجابة توليد أقل من 10ms
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs text-violet-400 font-mono">
+                            <span>المرحلة 3</span>
+                            <span>الأسبوع 3</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">تطوير محرر الأكواد</h4>
+                        <p class="text-xs text-slate-400">دمج بيئة Sandboxed Iframe ونظام التحقق الآلي للتمارين.</p>
+                        <div class="pt-2 text-[11px] text-slate-300 font-semibold border-t border-slate-800/60">
+                            KPI: اجتياز جميع اختبارات الأمان XSS
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs text-emerald-400 font-mono">
+                            <span>المرحلة 4</span>
+                            <span>الأسبوع 4</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">الاختبار والإطلاق</h4>
+                        <p class="text-xs text-slate-400">مراجعة التجاوب، الفحص الأمني الشامل، ونشر النسخة النهائية.</p>
+                        <div class="pt-2 text-[11px] text-slate-300 font-semibold border-t border-slate-800/60">
+                            KPI: تقييم أداء Lighthouse 95+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-cyan-400"></i>
+                <span class="font-bold text-slate-200">منصة التقنية والأناقة</span>
+                <span>— جميع الحقوق محفوظة © 2026</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <span class="hover:text-cyan-400 transition cursor-pointer">الشروط والأحكام</span>
+                <span>•</span>
+                <span class="hover:text-cyan-400 transition cursor-pointer">سياسة الخصوصية</span>
+                <span>•</span>
+                <span class="hover:text-cyan-400 transition cursor-pointer">وثيقة الأمان التقني</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- HINT MODAL (Code Editor) -->
+    <div id="hint-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 space-y-4 border border-amber-500/30">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-regular fa-lightbulb text-amber-400"></i> تلميح التمرين
+                </h3>
+                <button onclick="toggleHintModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p id="hint-modal-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                استخدم خبير Tailwind CSS لإضافة كلاسات التنسيق مثل `bg-slate-800` و `text-cyan-400` و `rounded-xl`.
+            </p>
+            <button onclick="toggleHintModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition">
+                فهمت ذلك، إغلاق
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-6 right-1/2 translate-x-1/2 z-50 hidden">
+        <div id="toast-body" class="px-5 py-3 rounded-2xl bg-slate-900 border border-cyan-500/40 text-cyan-300 text-xs font-semibold shadow-2xl flex items-center gap-2.5">
+            <i class="fa-solid fa-circle-check text-base"></i>
+            <span id="toast-message">تمت العملية بنجاح</span>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        // Global Navigation Tab Swapping
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Deactivate header tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-cyan-400', 'bg-slate-800/90', 'shadow-sm', 'active');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Show target section
+            const targetSection = document.getElementById(`section-${tabId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            // Highlight active button
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-cyan-400', 'bg-slate-800/90', 'shadow-sm', 'active');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Toast Alert Helper
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastBody = document.getElementById('toast-body');
+
+            toastMsg.innerText = message;
+            if (type === 'error') {
+                toastBody.className = "px-5 py-3 rounded-2xl bg-slate-900 border border-rose-500/40 text-rose-300 text-xs font-semibold shadow-2xl flex items-center gap-2.5";
+            } else {
+                toastBody.className = "px-5 py-3 rounded-2xl bg-slate-900 border border-cyan-500/40 text-cyan-300 text-xs font-semibold shadow-2xl flex items-center gap-2.5";
+            }
+
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-animate');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // ==========================================
+        // SECTION 1: TEXT AI PROMPT GENERATOR LOGIC
+        // ==========================================
+        
+        // Safety / Harmful content list
+        const bannedKeywords = ['اختراق', 'حظر', 'تجسس', 'hack', 'malware', 'exploit', 'password theft', 'سرقة البيانات'];
+
+        function updateTextPrompt() {
+            const role = document.getElementById('text-role').value.trim();
+            const context = document.getElementById('text-context').value.trim();
+            const constraints = document.getElementById('text-constraints').value.trim();
+            const format = document.getElementById('text-format').value;
+            const outputBox = document.getElementById('text-prompt-output');
+
+            if (!role && !context && !constraints) {
+                outputBox.innerText = 'أدخل التفاصيل في النموذج على اليمين لتوليد الأمر المحسّن هنا...';
+                updatePromptQualityScore(0, false);
+                return;
+            }
+
+            // Construct Structured Prompt
+            let promptText = `[الدور والهدف]:\n${role || 'لم يتم تحديده'}\n\n`;
+            promptText += `[السياق والتفاصيل]:\n${context || 'لا يوجد سياق إضافي'}\n\n`;
+            promptText += `[القيود والشروط]:\n${constraints || 'التزام الدقة والوضوح'}\n\n`;
+            promptText += `[صيغة المخرجات المطلوب تقديمها]:\nيرجى تسليم الإجابة في هيئة (${format}).`;
+
+            outputBox.innerText = promptText;
+            document.getElementById('prompt-char-count').innerText = `${promptText.length} حرف`;
+
+            // Calculate Score & Validate Safety
+            let score = 0;
+            if (role.length > 10) score += 35;
+            if (context.length > 15) score += 35;
+            if (constraints.length > 5) score += 30;
+
+            // Guardrail Safety Check
+            const fullText = (role + ' ' + context + ' ' + constraints).toLowerCase();
+            const hasHarmfulContent = bannedKeywords.some(keyword => fullText.includes(keyword));
+
+            updatePromptQualityScore(score, hasHarmfulContent);
+        }
+
+        function updatePromptQualityScore(score, hasHarmful) {
+            const scoreBar = document.getElementById('quality-score-bar');
+            const scoreText = document.getElementById('quality-score-text');
+            const guardrail = document.getElementById('guardrail-badge');
+            const guardrailText = document.getElementById('guardrail-text');
+
+            scoreBar.style.width = `${score}%`;
+
+            if (score < 40) {
+                scoreBar.className = "bg-rose-500 h-full transition-all duration-300";
+                scoreText.innerText = `ضعيف (${score}%)`;
+                scoreText.className = "font-bold text-rose-400";
+            } else if (score < 80) {
+                scoreBar.className = "bg-amber-500 h-full transition-all duration-300";
+                scoreText.innerText = `جيد (${score}%)`;
+                scoreText.className = "font-bold text-amber-400";
+            } else {
+                scoreBar.className = "bg-emerald-500 h-full transition-all duration-300";
+                scoreText.innerText = `ممتاز ومحترف (${score}%)`;
+                scoreText.className = "font-bold text-emerald-400";
+            }
+
+            if (hasHarmful) {
+                guardrail.className = "flex items-center gap-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400";
+                guardrailText.innerText = "تحذير أمان: يحتوي النص على كلمات قد تخالف قواعد استخدام الذكاء الاصطناعي.";
+            } else {
+                guardrail.className = "flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400";
+                guardrailText.innerText = "فحص المحتوى: لا توجد تحذيرات أمان، الأمر جاهز للاستخدام.";
+            }
+        }
+
+        function loadTextTemplate(type) {
+            if (type === 'article') {
+                document.getElementById('text-role').value = "بصفتك كاتب مقالات تقنية متمرس ومختص في التكنولوجيا الحديثة";
+                document.getElementById('text-context').value = "أرغب في كتابة مقال موجه لرواد الأعمال حول أهمية الذكاء الاصطناعي التوليدي في تحسين الإنتاجية.";
+                document.getElementById('text-constraints').value = "ألا يتجاوز المقال 500 كلمة، استخدام أسلوب مشوق، وتجنب التعقيد اللغوي.";
+                document.getElementById('text-format').value = "مقالة متكاملة مع عناوين فرعية";
+            } else if (type === 'code') {
+                document.getElementById('text-role').value = "بصفتك مهندس برمجيات محترف ومراجع أكواد (Senior Code Reviewer)";
+                document.getElementById('text-context').value = "قم بمراجعة دالة برمجية بلغة JavaScript وتقييم أداءها وأمانها.";
+                document.getElementById('text-constraints').value = "ركز على الثغرات الأمنية المحتملة مثل XSS وكفاءة استهلاك الذاكرة.";
+                document.getElementById('text-format').value = "شيفرة برمجية مع التعليقات الشارحة";
+            } else if (type === 'data') {
+                document.getElementById('text-role').value = "بصفتك محلل بيانات رئيسي وخبير في استخلاص الرؤى التجارية";
+                document.getElementById('text-context').value = "تحليل جدول مبيعات ربع سنوي وتحديد أكثر المنتجات نمواً وأسباب التراجع.";
+                document.getElementById('text-constraints').value = "تقديم 3 توصيات قابلة للتنفيذ فوراً بناءً على البيانات.";
+                document.getElementById('text-format').value = "جدول تقني منظم";
+            } else if (type === 'marketing') {
+                document.getElementById('text-role').value = "بصفتك مستشار تسويق رقمي وخبير في كتابة الإعلانات (Copywriter)";
+                document.getElementById('text-context').value = "إطلاق حملة تسويقية لمنصة تعليمية جديدة تستهدف المبرمجين المبتدئين.";
+                document.getElementById('text-constraints').value = "صياغة 3 نماذج إعلانية قصيرة وجذابة لشبكات التواصل الاجتماعي.";
+                document.getElementById('text-format').value = "نقاط محددة وقائمة منسقة";
+            }
+            updateTextPrompt();
+            showToast('تم تحميل القالب بنجاح');
+        }
+
+        function copyTextPrompt() {
+            const text = document.getElementById('text-prompt-output').innerText;
+            if (text.includes('أدخل التفاصيل')) return;
+            navigator.clipboard.writeText(text);
+            showToast('تم نسخ الأمر إلى الحافظة!');
+        }
+
+        function shareTextPrompt() {
+            const text = document.getElementById('text-prompt-output').innerText;
+            if (navigator.share) {
+                navigator.share({ title: 'أمر ذكاء اصطناعي', text: text });
+            } else {
+                navigator.clipboard.writeText(text);
+                showToast('تم نسخ رابط/نص المشاركة للحافظة!');
+            }
+        }
+
+        function exportTextPrompt() {
+            const text = document.getElementById('text-prompt-output').innerText;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'AI-Prompt-TechElegance.txt';
+            link.click();
+            showToast('تم تصدير الملف النصي');
+        }
+
+        // ==========================================
+        // SECTION 2: AI IMAGE PROMPT GENERATOR LOGIC
+        // ==========================================
+
+        function updateImagePrompt() {
+            const subject = document.getElementById('img-subject').value.trim();
+            const model = document.getElementById('img-model').value;
+            const style = document.getElementById('img-style').value;
+            const aspect = document.getElementById('img-aspect').value;
+            const lighting = document.getElementById('img-lighting').value;
+            const camera = document.getElementById('img-camera').value.trim();
+            const negative = document.getElementById('img-negative').value.trim();
+            const seed = document.getElementById('img-seed').value.trim();
+
+            const outputBox = document.getElementById('image-prompt-output');
+
+            if (!subject) {
+                outputBox.innerText = '-- أدخل موضوع الصورة الرئيسي لتشكل الأمر النهائي --';
+                return;
+            }
+
+            let promptStr = `${subject}, ${style}, ${lighting}, ${camera}`;
+
+            // Add Model Specific Syntax
+            if (model === 'midjourney') {
+                promptStr += ` --ar ${aspect}`;
+                if (seed) promptStr += ` --seed ${seed}`;
+                if (negative) promptStr += ` --no ${negative}`;
+                promptStr += ` --v 6.0`;
+            } else if (model === 'dalle3') {
+                promptStr = `DALL-E 3 Prompt: ${promptStr}. Aspect Ratio: ${aspect}. High detail quality. Avoid: ${negative}`;
+            } else if (model === 'flux') {
+                promptStr = `[FLUX.1]: ${promptStr}, ratio ${aspect}. negative_prompt: (${negative})`;
+            } else if (model === 'sdxl') {
+                promptStr = `${promptStr} <lora:tech_elegance:0.8> --aspect ${aspect} --no ${negative}`;
+            }
+
+            outputBox.innerText = promptStr;
+
+            // Update Simulated Preview Component
+            document.getElementById('selected-model-badge').innerText = model.toUpperCase();
+            document.getElementById('preview-ratio-label').innerText = aspect;
+            document.getElementById('preview-model-label').innerText = model;
+            document.getElementById('preview-seed-label').innerText = seed || 'Random';
+            document.getElementById('preview-style-label').innerText = style.split(',')[0];
+        }
+
+        function applyImagePreset(presetKey) {
+            if (presetKey === 'smartwatch') {
+                document.getElementById('img-subject').value = "A futuristic luxury smartwatch crafted from polished titanium with holographic UI floating screen";
+                document.getElementById('img-style').value = "Cyberpunk Luxury, Neon accents, Sleek dark metal";
+                document.getElementById('img-aspect').value = "16:9";
+            } else if (presetKey === 'dashboard') {
+                document.getElementById('img-subject').value = "Modern minimalist developer dashboard displayed on a curved glass monitor in a dark sleek office";
+                document.getElementById('img-style').value = "Minimalist Tech, Clean lines, Studio background";
+                document.getElementById('img-aspect').value = "16:9";
+            } else if (presetKey === 'portrait') {
+                document.getElementById('img-subject').value = "Cinematic portrait of a confident female AI researcher wearing tech-embedded cyberpunk elegant apparel";
+                document.getElementById('img-style').value = "Cinematic Studio Portrait, Dramatic lighting, 85mm lens";
+                document.getElementById('img-aspect').value = "9:16";
+            } else if (presetKey === 'architecture') {
+                document.getElementById('img-subject').value = "Ultra-modern eco-friendly tech headquarters building surrounded by glowing vertical gardens at dusk";
+                document.getElementById('img-style').value = "Hyper-photorealistic, 8k resolution, Unreal Engine 5 render";
+                document.getElementById('img-aspect').value = "16:9";
+            }
+            updateImagePrompt();
+            showToast('تم تطبيق نموذج الصورة بنجاح');
+        }
+
+        function copyImagePrompt() {
+            const text = document.getElementById('image-prompt-output').innerText;
+            if (text.includes('-- أدخل موضوع')) return;
+            navigator.clipboard.writeText(text);
+            showToast('تم نسخ أمر الصورة النهائي!');
+        }
+
+        function exportImagePrompt() {
+            const text = document.getElementById('image-prompt-output').innerText;
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Image-Prompt-TechElegance.txt';
+            link.click();
+            showToast('تم تصدير توصيف الصورة');
+        }
+
+        // ==========================================
+        // SECTION 3: CODE EDITOR & SANDBOX LOGIC
+        // ==========================================
+
+        let activeCodeTab = 'html';
+        let currentExerciseId = '1';
+
+        const exercisesData = {
+            '1': {
+                title: 'التمرين الأول: إنشاء بطاقة تعريفية أنيقة',
+                desc: 'عدّل العنوان الرئيسي وأضف زراً تفاعلياً بأسلوب Tailwind CSS.',
+                hint: 'قم بتغيير النص داخل عنصر <h1>، وأضف زراً يحتوي على الكلاس bg-cyan-600 ليكون تصميمه متناسقاً.',
+                defaultHtml: `<div class="p-8 max-w-sm mx-auto bg-slate-900 rounded-2xl border border-slate-800 text-center shadow-xl font-sans text-white">
+  <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+    💻
+  </div>
+  <h2 id="user-title" class="text-xl font-bold mb-2">مطور المستقبل</h2>
+  <p class="text-xs text-slate-400 mb-6">مرحباً بك في بيئة المحرر التفاعلي لمنصة التقنية والأناقة.</p>
+  <button id="main-btn" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold transition">
+    اضغط هنا للمتابعة
+  </button>
+</div>`,
+                defaultCss: `/* يمكنك إضافة تنسيقات CSS مخصصة هنا */\nbody { background-color: #0f172a; display: flex; align-items: center; justify-content: center; min-h: 100vh; }`,
+                defaultJs: `// كود JavaScript التفاعلي\ndocument.getElementById('main-btn').addEventListener('click', function() {\n  alert('تم النقر على الزر التفاعلي!');\n});`
+            },
+            '2': {
+                title: 'تمرين 2: زر تفاعلي وتغيير النصوص (JavaScript)',
+                desc: 'اكتب كود يغير نص العنوان عند الضغط على الزر.',
+                hint: 'استخدم document.getElementById("title").innerText = "تم التحديث!" داخل مستمع الأحداث.',
+                defaultHtml: `<div class="p-8 max-w-sm mx-auto bg-slate-900 rounded-2xl border border-slate-800 text-center text-white">
+  <h2 id="status-title" class="text-lg font-bold mb-4">الحالة الحالية: قيد الانتظار</h2>
+  <button id="action-btn" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold">
+    تغيير الحالة
+  </button>
+</div>`,
+                defaultCss: `body { background-color: #0f172a; padding: 40px; }`,
+                defaultJs: `document.getElementById('action-btn').addEventListener('click', function() {\n  document.getElementById('status-title').innerText = "تم التفعيل بنجاح! 🚀";\n  this.style.backgroundColor = "#10b981";\n});`
+            },
+            '3': {
+                title: 'تمرين 3: شبكة أسعار متجاوبة (Responsive Grid)',
+                desc: 'صمم خطتين للأسعار باستخدام نظام Grid المتجاوب.',
+                hint: 'استخدم الكلاس grid grid-cols-1 sm:grid-cols-2 gap-4 لإنشاء تخطيط متجاوب.',
+                defaultHtml: `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto p-4 text-white">
+  <div class="p-6 bg-slate-900 rounded-2xl border border-slate-800 text-center">
+    <h3 class="font-bold text-slate-300 mb-2">الباقة الأساسية</h3>
+    <p class="text-2xl font-bold text-cyan-400 mb-4">مجاناً</p>
+  </div>
+  <div class="p-6 bg-slate-900 rounded-2xl border border-cyan-500/40 text-center">
+    <h3 class="font-bold text-cyan-400 mb-2">الباقة الاحترافية</h3>
+    <p class="text-2xl font-bold text-white mb-4">$29/شهر</p>
+  </div>
+</div>`,
+                defaultCss: `body { background-color: #0f172a; }`,
+                defaultJs: `// جاهز للعمل`
+            }
+        };
+
+        function switchCodeTab(tab) {
+            activeCodeTab = tab;
+            ['html', 'css', 'js'].forEach(t => {
+                const btn = document.getElementById(`code-tab-${t}`);
+                const area = document.getElementById(`editor-${t}`);
+                if (t === tab) {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition";
+                    area.classList.remove('hidden');
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition";
+                    area.classList.add('hidden');
+                }
+            });
+        }
+
+        function runCodePreview() {
+            const html = document.getElementById('editor-html').value;
+            const css = document.getElementById('editor-css').value;
+            const js = document.getElementById('editor-js').value;
+
+            const iframe = document.getElementById('sandbox-iframe');
+            
+            // Build Sandboxed Document with Tailwind Support
+            const combinedSource = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        body { margin: 0; padding: 16px; font-family: sans-serif; }
+                        ${css}
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                    <script>
+                        try {
+                            ${js}
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            iframe.srcdoc = combinedSource;
+            document.getElementById('editor-status').innerText = 'تم تحديث المعاينة المباشرة';
+            setTimeout(() => {
+                document.getElementById('editor-status').innerText = 'جاهز للتحرير...';
+            }, 2000);
+        }
+
+        function loadExercise(id) {
+            currentExerciseId = id;
+            const ex = exercisesData[id];
+            if (!ex) return;
+
+            document.getElementById('exercise-title').innerText = ex.title;
+            document.getElementById('exercise-desc').innerText = ex.desc;
+            document.getElementById('hint-modal-text').innerText = ex.hint;
+
+            document.getElementById('editor-html').value = ex.defaultHtml;
+            document.getElementById('editor-css').value = ex.defaultCss;
+            document.getElementById('editor-js').value = ex.defaultJs;
+
+            runCodePreview();
+            showToast(`تم تحميل ${ex.title}`);
+        }
+
+        function validateSolution() {
+            const htmlVal = document.getElementById('editor-html').value;
+            if (htmlVal.trim().length > 30) {
+                showToast('أحسنت! الإجابة صحيحة واجتازت الاختبار الآلي 🚀');
+            } else {
+                showToast('يرجى إضافة المزيد من العناصر لتلبية شروط التمرين', 'error');
+            }
+        }
+
+        function toggleHintModal() {
+            const modal = document.getElementById('hint-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function saveProgress() {
+            const progress = {
+                html: document.getElementById('editor-html').value,
+                css: document.getElementById('editor-css').value,
+                js: document.getElementById('editor-js').value,
+            };
+            localStorage.setItem('tech_elegance_code', JSON.stringify(progress));
+            showToast('تم حفظ الكود في التخزين المحلي بنجاح!');
+        }
+
+        function loadDefaultTemplate() {
+            loadExercise(currentExerciseId);
+        }
+
+        function resetEditorCode() {
+            loadExercise(currentExerciseId);
+            showToast('تمت إعادة ضبط المحرر');
+        }
+
+        // ==========================================
+        // INITIALIZATION ON PAGE LOAD
+        // ==========================================
+        window.onload = function() {
+            // Load Initial Prompts
+            loadTextTemplate('article');
+            applyImagePreset('smartwatch');
+
+            // Check if saved code exists in LocalStorage
+            const savedCode = localStorage.getItem('tech_elegance_code');
+            if (savedCode) {
+                try {
+                    const parsed = JSON.parse(savedCode);
+                    if (parsed.html) document.getElementById('editor-html').value = parsed.html;
+                    if (parsed.css) document.getElementById('editor-css').value = parsed.css;
+                    if (parsed.js) document.getElementById('editor-js').value = parsed.js;
+                } catch(e){}
+            } else {
+                loadExercise('1');
+            }
+
+            // Execute initial sandbox render
+            runCodePreview();
+        };
+    </script>
+</body>
+</html>
